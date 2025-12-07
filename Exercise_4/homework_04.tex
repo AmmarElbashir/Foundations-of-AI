@@ -19,38 +19,34 @@ Translate the following sentences into first order logic:
 \begin{enumerate}[label=\alph*.]
     \item There is an ice cream flavor loved by everyone.
     \begin{framed}
-        Let \( icecream \) be a constant.\\
-        \( \exists\;icecream\;\forall\; x: Loves(x,icecream) \)
+        \( \exists flavor\;\forall x: Loves(x,flavor) \)
     \end{framed}
     \item It is not true that everyone loves some ice cream flavor.
     \begin{framed}
-        Let \( icecream \) be a constant.\\
-        \( \exists\;x\;\forall\;icescrem: \lnot(Loves(x,icecream)) \)
+        \( \exists x\;\forall flavor: \lnot Loves(x,icecream) \)
     \end{framed}
     \item Anyone who does not shave himself must be shaved by the barber.
     \begin{framed}
         Let \( barber \) be a constant.\\
-        \( \forall x: \lnot(Shaves(x,x)) \Rightarrow  Shaves(barber,x) \)
+        \( \forall x: \lnot(Shaves(x,x)) \to  Shaves(barber,x) \)
     \end{framed}
     \item Whomever the barber shaves, must not shave himself.
     \begin{framed}
         Let \( barber \) be a constant.\\
-        \( \forall x: Shaves(barber,x) \Rightarrow  \lnot (Shaves(x,x)) \)
+        \( \forall x: Shaves(barber,x) \to  \lnot (Shaves(x,x)) \)
     \end{framed}
     \item Rudolph is a reindeer and Rudolph has a red nose.
     \begin{framed}
-        Let \( Rudolph \), \( barber \), \( red nose \) be constants.\\
-        \( Is(Rudolph,barber) \land Is(Rudolph,red nose) \)
+        Let \( rudolph \) be a constant.\\
+        \( Reindeer(rudolph) \land RedNose(rudolph) \)
     \end{framed}
     \item Anyone with a red nose is weird or is a clown.
     \begin{framed}
-        Let \( weird \), \( clown\) be constants.\\
-        \( \forall x:  Is(x,weird) \lor Is(x,clown) \)
+        \( \forall x:  RedNose(x) \to (Weird(x) \lor Clown(x)) \)
     \end{framed}
     \item No reindeer is a clown.
     \begin{framed}
-        Let \( reindeer \), \( clown \) be constants.\\
-        \( \forall\;reindeer:  \lnot(Is(reindeer,clown)) \)
+        \( \forall x: Reindeer(x) \to \lnot Clown(x) \)
     \end{framed}
 \end{enumerate}
 Note: You are not required to specify which object a variable refers to, or what a function returns, if it is obvious from the context. For instance, it’s obvious from the context that \( x \) is a person and \( Likes(x,y) \) is true if \( x \) likes some \( y \). However, if you think that the context is insufficient, you might start providing definitions.
@@ -66,7 +62,8 @@ Reduce the following sentences to clausal form:
                 & \equiv \forall x \forall y(\lnot R(x,y) \lor (R(x,y) \land Q(y))) \\
                 & \equiv \forall x \forall y((\lnot R(x,y) \lor R(x,y)) \land (\lnot R(x,y) \lor Q(y))) \\
                 & \equiv \forall x \forall y(1 \land (\lnot R(x,y) \lor Q(y))) \\
-                & \equiv \forall x \forall y((\lnot R(x,y) \lor Q(y)))
+                & \equiv \forall x \forall y((\lnot R(x,y) \lor Q(y))) \\
+                & \equiv \boxed{\lnot R(x,y) \lor Q(y)}
             \end{aligned}
         \]
     \end{framed}
@@ -75,7 +72,9 @@ Reduce the following sentences to clausal form:
         \[
             \begin{aligned}
                 & \forall x \exists y \forall z (P(x,y,z) \rightarrow \exists uR(x,u,z)) \\
-                & \equiv \forall x \exists y \forall z (\lnot P(x,y,z) \lor \exists uR(x,u,z))
+                & \equiv \forall x \exists y \forall z (\lnot P(x,y,z) \lor \exists uR(x,u,z)) \\
+                & \equiv \forall x \forall z(\lnot P(x,F(x),z) \lor R(x,G(x,z),z)) \\
+                & \equiv \boxed{\lnot P(x,F(x),z) \lor R(x,G(x,z),z)}
             \end{aligned}
         \]
     \end{framed}
@@ -84,7 +83,9 @@ Reduce the following sentences to clausal form:
         \[
             \begin{aligned}
                 & \forall x(\lnot \exists y P(x,y) \land \lnot (Q(x) \land \lnot R(x))) \\
-                & \equiv \forall x(\lnot \exists y P(x,y) \land  (\lnot Q(x) \lor R(x)))
+                & \equiv \forall x(\lnot \exists y P(x,y) \land  (\lnot Q(x) \lor R(x))) \\
+                & \equiv \forall x(\forall y \lnot P(x,y) \land  (\lnot Q(x) \lor R(x))) \\
+                & \equiv \boxed{\lnot P(x,y) \land  (\lnot Q(x) \lor R(x))}
             \end{aligned}
         \]
     \end{framed}
@@ -98,12 +99,31 @@ Let \( flee \), \( stay \), \( now \), \( lion \) be constants. You are given th
 \textbf{S4} \( Observe(now, lion) \)\\
 Use Resolution to show that the KB entails \( \exists xSuggestion(now, x) \) and extract an answer.
 \begin{framed}
+    \[
+        \begin{aligned}
+            \textbf{S1:}  \\
+            & \forall t \forall x(Observe(t, x) \land Danger(x) \rightarrow Suggestion(t, flee)) \\
+            & \equiv \lnot Observe(t,x) \lor \lnot Danger(x) \lor Suggestion(t, flee) \\
+            \textbf{S2:} \\
+            & \forall t(\lnot \exists x(Observe(t, x) \land Danger(x)) \rightarrow Suggestion(t, stay)) \\
+            & \equiv (Observe(t,f(t)) \land Danger(f(t))) \lor Suggestion(t,stay) \\
+            \textbf{S3:} \\
+            & Danger(lion) \\ 
+            \textbf{S3:} \\
+            & Observe(now, lion) \\
+            \textbf{Negated Query:} \\
+            & \lnot \exists x Suggestion(now,x) \\
+            & \equiv \forall x \lnot Suggestion(now,x) \\
+            & \equiv \lnot Suggestion(now,x)
+        \end{aligned}
+    \]
     \begin{figure}[H]
         \centering
         \includegraphics[width=\linewidth]{Graphs/Foundations_AI 2.pdf}
-        \caption{PL-Resolution}
+        \caption{FOL-Resolution}
         \label{fig:PLResolution}
     \end{figure}
+    The empty set at the end proofs, that the $KB \land \lnot Query$ is unsatisfiable, but that implies that the Query is satisfiable. The extracted answer is \boxed{x = flee}. It was not necessary to use the entire knowledge base, since a subset already proofed the unsatisfiability.
 \end{framed}
 \newpage
 
