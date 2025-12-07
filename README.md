@@ -1,2 +1,2 @@
-# Foundation-of-AI
-Foundation of AI
+# Foundations-of-AI
+Foundations of AI
